@@ -2,16 +2,18 @@ const express = require("express");
 const { createCanvas, loadImage } = require("canvas");
 
 const app = express();
-app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("Develop Welcome Image Generator is online!");
 });
+
 app.get("/test", (req, res) => {
   res.send("Route is working!");
 });
+
 app.get("/welcome", async (req, res) => {
   console.log("WELCOME ROUTE HIT");
+  try {
     const username = req.query.username || "New Member";
     const server = req.query.server || "My Server";
     const count = req.query.count || "1";
@@ -25,6 +27,7 @@ app.get("/welcome", async (req, res) => {
     gradient.addColorStop(1, "#006d91");
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 1000, 400);
+
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 48px Sans";
     ctx.fillText("WELCOME!", 300, 110);
@@ -50,9 +53,11 @@ app.get("/welcome", async (req, res) => {
     res.send(canvas.toBuffer("image/png"));
   } catch (error) {
     console.error(error);
-res.status(500).send("Image generation failed: " + error.message);
+    res.status(500).send("Image generation failed: " + error.message);
   }
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Develop image generator running on ${port}`));
+app.listen(port, () => {
+  console.log(`Develop image generator running on ${port}`);
+});
