@@ -7,7 +7,9 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Develop Welcome Image Generator is online!");
 });
-
+app.get("/test", (req, res) => {
+  res.send("Route is working!");
+});
 app.get("/welcome", async (req, res) => {
   try {
     const username = req.query.username || "New Member";
