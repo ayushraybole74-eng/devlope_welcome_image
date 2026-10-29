@@ -1,10 +1,15 @@
+
 const express = require("express");
 const { createCanvas, loadImage } = require("canvas");
 
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Welcome image service is online!");
+  res.send("Welcome Image Service is Online!");
+});
+
+app.get("/test", (req, res) => {
+  res.send("Route is working!");
 });
 
 app.get("/welcome", async (req, res) => {
@@ -12,46 +17,84 @@ app.get("/welcome", async (req, res) => {
     const username = String(req.query.username || "New Member");
     const server = String(req.query.server || "My Server");
     const count = String(req.query.count || "1");
+    const avatar = req.query.avatar;
 
     const canvas = createCanvas(1000, 400);
     const ctx = canvas.getContext("2d");
 
-    ctx.fillStyle = "#10152f";
-    ctx.fillRect(0, 0, 1000, 400);
-
+    // Gradient background
     const gradient = ctx.createLinearGradient(0, 0, 1000, 400);
-    gradient.addColorStop(0, "#10152f");
+    gradient.addColorStop(0, "#080b18");
+    gradient.addColorStop(0.5, "#102c50");
     gradient.addColorStop(1, "#006d91");
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 1000, 400);
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 52px Sans";
-    ctx.fillText("WELCOME!", 300, 110);
-    ctx.font = "bold 38px Sans";
-    ctx.fillText(username.slice(0, 25), 300, 180);
-    ctx.font = "28px Sans";
-    ctx.fillText(server.slice(0, 35), 300, 240);
-    ctx.fillText("Member #" + count, 300, 300);
+    // Glowing corner accents
+    ctx.strokeStyle = "#38caff";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(12, 12, 976, 376);
 
-    if (req.query.avatar && req.query.avatar.startsWith("https://")) {
-      const image = await loadImage(req.query.avatar);
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(170, 200, 90, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(image, 80, 110, 180, 180);
-      ctx.restore();
+    // Avatar
+    if (typeof avatar === "string" &&
+        /^https:\/\/\S+$/i.test(avatar)) {
+      try {
+        const image = await loadImage(avatar);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(170, 200, 92, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(image, 78, 108, 184, 184);
+        ctx.restore();
+
+        ctx.beginPath();
+        ctx.arc(170, 200, 96, 0, Math.PI * 2);
+        ctx.strokeStyle = "#38caff";
+        ctx.lineWidth = 5;
+        ctx.stroke();
+      } catch (e) {
+        console.error("Avatar loading failed:", e.message);
+      }
     }
 
+    // Welcome text
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 54px Sans";
+    ctx.fillText("WELCOME!", 310, 105);
+
+    ctx.fillStyle = "#53d5ff";
+    ctx.fillRect(310, 128, 570, 3);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 38px Sans";
+    ctx.fillText(username.slice(0, 25), 310, 190);
+
+    ctx.font = "28px Sans";
+    ctx.fillText(server.slice(0, 35), 310, 250);
+    ctx.fillText("Member #" + count.slice(0, 12), 310, 305);
+
+    ctx.fillStyle = "#bceeff";
+    ctx.font = "20px Sans";
+    ctx.fillText("WELCOME TO THE COMMUNITY", 310, 355);
+
+    // Send PNG image
+    const buffer = canvas.toBuffer("image/png");
+    res.status(200);
     res.set("Content-Type", "image/png");
     res.set("Cache-Control", "no-store");
-    res.send(canvas.toBuffer("image/png"));
+    res.set("Content-Length", String(buffer.length));
+    res.end(buffer);
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Image generation failed: " + error.message);
+    console.error("Welcome image error:", error);
+    if (!res.headersSent) {
+      res.status(500).type("text").send(
+        "Image generation failed: " + error.message
+      );
+    }
   }
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("Welcome image service running on " + port));
+app.listen(port, () => {
+  console.log("Welcome image service running on port " + port);
+});
