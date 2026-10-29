@@ -49,7 +49,8 @@ app.get("/welcome", async (req, res) => {console.log("WELCOME ROUTE HIT");
     res.set("Content-Type", "image/png");
     res.send(canvas.toBuffer("image/png"));
   } catch (error) {
-    res.status(400).send("Image generation failed.");
+    console.error(error);
+res.status(500).send("Image generation failed: " + error.message);
   }
 });
 
