@@ -10,8 +10,8 @@ app.get("/", (req, res) => {
 app.get("/test", (req, res) => {
   res.send("Route is working!");
 });
-app.get("/welcome", async (req, res) => {console.log("WELCOME ROUTE HIT");
-  try {
+app.get("/welcome", async (req, res) => {
+  console.log("WELCOME ROUTE HIT");
     const username = req.query.username || "New Member";
     const server = req.query.server || "My Server";
     const count = req.query.count || "1";
