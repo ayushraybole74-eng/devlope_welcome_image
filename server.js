@@ -10,7 +10,7 @@ app.get("/", (req, res) => {
 app.get("/test", (req, res) => {
   res.send("Route is working!");
 });
-app.get("/welcome", async (req, res) => {
+app.get("/welcome", async (req, res) => {console.log("WELCOME ROUTE HIT");
   try {
     const username = req.query.username || "New Member";
     const server = req.query.server || "My Server";
@@ -25,7 +25,6 @@ app.get("/welcome", async (req, res) => {
     gradient.addColorStop(1, "#006d91");
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 1000, 400);
-
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 48px Sans";
     ctx.fillText("WELCOME!", 300, 110);
