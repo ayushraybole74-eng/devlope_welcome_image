@@ -1,0 +1,13 @@
+{
+  "name": "develop-welcome-image",
+  "version": "1.0.0",
+  "description": "Automatic Discord welcome image generator",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "canvas": "^2.11.2"
+  }
+}
