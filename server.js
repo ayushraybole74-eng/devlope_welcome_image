@@ -4,23 +4,20 @@ const { createCanvas, loadImage } = require("canvas");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Develop Welcome Image Generator is online!");
-});
-
-app.get("/test", (req, res) => {
-  res.send("Route is working!");
+  res.send("Welcome image service is online!");
 });
 
 app.get("/welcome", async (req, res) => {
-  console.log("WELCOME ROUTE HIT");
   try {
-    const username = req.query.username || "New Member";
-    const server = req.query.server || "My Server";
-    const count = req.query.count || "1";
-    const avatar = req.query.avatar;
+    const username = String(req.query.username || "New Member");
+    const server = String(req.query.server || "My Server");
+    const count = String(req.query.count || "1");
 
     const canvas = createCanvas(1000, 400);
     const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#10152f";
+    ctx.fillRect(0, 0, 1000, 400);
 
     const gradient = ctx.createLinearGradient(0, 0, 1000, 400);
     gradient.addColorStop(0, "#10152f");
@@ -29,18 +26,16 @@ app.get("/welcome", async (req, res) => {
     ctx.fillRect(0, 0, 1000, 400);
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 48px Sans";
+    ctx.font = "bold 52px Sans";
     ctx.fillText("WELCOME!", 300, 110);
+    ctx.font = "bold 38px Sans";
+    ctx.fillText(username.slice(0, 25), 300, 180);
+    ctx.font = "28px Sans";
+    ctx.fillText(server.slice(0, 35), 300, 240);
+    ctx.fillText("Member #" + count, 300, 300);
 
-    ctx.font = "bold 36px Sans";
-    ctx.fillText(username.slice(0, 25), 300, 175);
-
-    ctx.font = "26px Sans";
-    ctx.fillText(server.slice(0, 35), 300, 235);
-    ctx.fillText("Member #" + count, 300, 290);
-
-    if (avatar && avatar.startsWith("https://")) {
-      const image = await loadImage(avatar);
+    if (req.query.avatar && req.query.avatar.startsWith("https://")) {
+      const image = await loadImage(req.query.avatar);
       ctx.save();
       ctx.beginPath();
       ctx.arc(170, 200, 90, 0, Math.PI * 2);
@@ -50,6 +45,7 @@ app.get("/welcome", async (req, res) => {
     }
 
     res.set("Content-Type", "image/png");
+    res.set("Cache-Control", "no-store");
     res.send(canvas.toBuffer("image/png"));
   } catch (error) {
     console.error(error);
@@ -58,6 +54,4 @@ app.get("/welcome", async (req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Develop image generator running on ${port}`);
-});
+app.listen(port, () => console.log("Welcome image service running on " + port));
